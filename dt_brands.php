@@ -28,7 +28,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class Dt_brands extends Module
+use PrestaShop\PrestaShop\Core\Module\WidgetInterface;  
+
+class Dt_brands extends Module implements WidgetInterface
 {
     protected $config_form = false;
 
@@ -51,6 +53,7 @@ class Dt_brands extends Module
         $this->description = $this->l('Show brands in the FO of the theme');
 
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
+        $this->template_file = 'dt_brands.tpl';
     }
 
     /**
@@ -214,5 +217,38 @@ class Dt_brands extends Module
     {
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
+    }
+
+    public function renderWidget($hookName = null, array $configuration = [])
+    {
+        if ($hookName == null && isset($configuration['hook'])) {
+                        $hookName = $configuration['hook'];
+        }
+        
+        $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
+        return $this->fetch('module:'.$this->name.'/'.$this->template_file);
+    }
+
+    public function getWidgetVariables($hookName = null, array $configuration = [])
+    {
+        $address = $this->context->shop->getAddress();
+        $contact_infos = [
+            'company' => Configuration::get('PS_SHOP_NAME'),
+            'address' => [
+                'formatted' => AddressFormat::generateAddress($address, array(), '<br />'),
+                'address1' => $address->address1,
+                'address2' => $address->address2,
+                'postcode' => $address->postcode,
+                'city' => $address->city,
+                'state' => (new State($address->id_state))->name[$this->context->language->id],
+                'country' => (new Country($address->id_country))->name[$this->context->language->id],
+            ],
+            'phone' => Configuration::get('PS_SHOP_PHONE'),
+            'fax' => Configuration::get('PS_SHOP_FAX'),
+            'email' => Configuration::get('PS_SHOP_EMAIL'),
+        ];
+        return [
+            'contact_infos' => $contact_infos,
+        ];
     }
 }
