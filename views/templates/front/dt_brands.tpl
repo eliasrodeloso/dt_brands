@@ -5,10 +5,7 @@
 		
 		{foreach from=$brands item=brand}
 			<ul>	
-				<h1>{$brand.name}</h1>
-				<p>
-					{$brand.desc}
-				</p>
+				<a href="{$brand.link}"><img src="{$brand.image}" alt="{$brand.name}"></a>
 			</ul>
 		{/foreach}
 		

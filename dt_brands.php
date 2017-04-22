@@ -28,7 +28,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\PrestaShop\Core\Module\WidgetInterface;  
+use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
+use PrestaShop\PrestaShop\Adapter\Manufacturer\ManufacturerDataProvider;
 
 class Dt_brands extends Module implements WidgetInterface
 {
@@ -199,19 +200,33 @@ class Dt_brands extends Module implements WidgetInterface
 
     public function getWidgetVariables($hookName = null, array $configuration = [])
     {
-        $brands = array();
-        for ($i = 0; $i <= 10; $i++)
-        {
-            $brand = array(
-                'name' => $i,
-                'desc' => $i + $i,
-            );
-            $brands[$i] = $brand;
-        }
-        
         return array(
-            'brands' => $brands,
+            'brands' => $this->getBrands(),
             'title' => Configuration::get('DT_BRANDS_TITLE'),
         );
     }
+
+    /*
+    *   Module to get the brands
+    * 
+    */
+    private function getBrands()
+    {
+        $provider = new ManufacturerDataProvider();
+        $manufacturers = $provider->getManufacturers();
+        
+        $brands = array();
+
+        for ($i = 0; $i < count($manufacturers); $i++)
+        {
+            $brands[$i] = array(
+                'name' => $manufacturers[$i]['name'],
+                'image' => $this->context->link->getManufacturerImageLink($manufacturers[$i]['id_manufacturer'], 'small_default'),
+                'link' => $this->context->link->getmanufacturerLink($manufacturers[$i]['id_manufacturer']),
+            );
+        }
+
+        return $brands;
+    }
+
 }
