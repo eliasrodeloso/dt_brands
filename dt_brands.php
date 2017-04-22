@@ -189,10 +189,6 @@ class Dt_brands extends Module implements WidgetInterface
 
     public function renderWidget($hookName = null, array $configuration = [])
     {
-        if ($hookName == null && isset($configuration['hook'])) {
-                        $hookName = $configuration['hook'];
-        }
-        
         $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
         return $this->fetch('module:'.$this->name.'/'.$this->template_file);
     }
