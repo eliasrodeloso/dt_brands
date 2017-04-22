@@ -53,7 +53,7 @@ class Dt_brands extends Module implements WidgetInterface
         $this->description = $this->l('Show brands in the FO of the theme');
 
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-        $this->template_file = 'dt_brands.tpl';
+        $this->template_file = 'views/templates/front/dt_brands.tpl';
     }
 
     /**
