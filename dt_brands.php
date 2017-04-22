@@ -189,8 +189,12 @@ class Dt_brands extends Module implements WidgetInterface
 
     public function renderWidget($hookName = null, array $configuration = [])
     {
-        $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
-        return $this->fetch('module:'.$this->name.'/'.$this->template_file);
+        $active = (bool)Configuration::get('DT_BRANDS_ACTIVE');
+        if($active){
+            $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
+            return $this->fetch('module:'.$this->name.'/'.$this->template_file);
+        }
+        return;
     }
 
     public function getWidgetVariables($hookName = null, array $configuration = [])
@@ -205,9 +209,9 @@ class Dt_brands extends Module implements WidgetInterface
             $brands[$i] = $brand;
         }
         
-        
         return array(
-            'brands' => $brands
+            'brands' => $brands,
+            'title' => Configuration::get('DT_BRANDS_TITLE'),
         );
     }
 }
