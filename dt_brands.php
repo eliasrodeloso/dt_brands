@@ -62,16 +62,14 @@ class Dt_brands extends Module implements WidgetInterface
      */
     public function install()
     {
-        Configuration::updateValue('DT_BRANDS_LIVE_MODE', false);
+        Configuration::updateValue('DT_BRANDS_ACTIVE', false);
 
-        return parent::install() &&
-            $this->registerHook('header') &&
-            $this->registerHook('backOfficeHeader');
+        return parent::install();
     }
 
     public function uninstall()
     {
-        Configuration::deleteByName('DT_BRANDS_LIVE_MODE');
+        Configuration::deleteByName('DT_BRANDS_ACTIVE');
 
         return parent::uninstall();
     }
@@ -88,11 +86,7 @@ class Dt_brands extends Module implements WidgetInterface
             $this->postProcess();
         }
 
-        $this->context->smarty->assign('module_dir', $this->_path);
-
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
-
-        return $output.$this->renderForm();
+        return $this->renderForm();
     }
 
     /**
@@ -137,10 +131,10 @@ class Dt_brands extends Module implements WidgetInterface
                 'input' => array(
                     array(
                         'type' => 'switch',
-                        'label' => $this->l('Live mode'),
-                        'name' => 'DT_BRANDS_LIVE_MODE',
+                        'label' => $this->l('Active module'),
+                        'name' => 'DT_BRANDS_ACTIVE',
                         'is_bool' => true,
-                        'desc' => $this->l('Use this module in live mode'),
+                        'desc' => $this->l('Decide or not to show this module'),
                         'values' => array(
                             array(
                                 'id' => 'active_on',
@@ -155,17 +149,12 @@ class Dt_brands extends Module implements WidgetInterface
                         ),
                     ),
                     array(
-                        'col' => 3,
+                        'col' => 5,
                         'type' => 'text',
-                        'prefix' => '<i class="icon icon-envelope"></i>',
-                        'desc' => $this->l('Enter a valid email address'),
-                        'name' => 'DT_BRANDS_ACCOUNT_EMAIL',
-                        'label' => $this->l('Email'),
-                    ),
-                    array(
-                        'type' => 'password',
-                        'name' => 'DT_BRANDS_ACCOUNT_PASSWORD',
-                        'label' => $this->l('Password'),
+                        'prefix' => '<i class="icon icon-info"></i>',
+                        'desc' => $this->l('Enter the title of the module on FO'),
+                        'name' => 'DT_BRANDS_TITLE',
+                        'label' => $this->l('Title'),
                     ),
                 ),
                 'submit' => array(
@@ -181,9 +170,8 @@ class Dt_brands extends Module implements WidgetInterface
     protected function getConfigFormValues()
     {
         return array(
-            'DT_BRANDS_LIVE_MODE' => Configuration::get('DT_BRANDS_LIVE_MODE', true),
-            'DT_BRANDS_ACCOUNT_EMAIL' => Configuration::get('DT_BRANDS_ACCOUNT_EMAIL', 'contact@prestashop.com'),
-            'DT_BRANDS_ACCOUNT_PASSWORD' => Configuration::get('DT_BRANDS_ACCOUNT_PASSWORD', null),
+            'DT_BRANDS_ACTIVE' => Configuration::get('DT_BRANDS_ACTIVE', true),
+            'DT_BRANDS_TITLE' => Configuration::get('DT_BRANDS_TITLE'),
         );
     }
 
@@ -197,26 +185,6 @@ class Dt_brands extends Module implements WidgetInterface
         foreach (array_keys($form_values) as $key) {
             Configuration::updateValue($key, Tools::getValue($key));
         }
-    }
-
-    /**
-    * Add the CSS & JavaScript files you want to be loaded in the BO.
-    */
-    public function hookBackOfficeHeader()
-    {
-        if (Tools::getValue('module_name') == $this->name) {
-            $this->context->controller->addJS($this->_path.'views/js/back.js');
-            $this->context->controller->addCSS($this->_path.'views/css/back.css');
-        }
-    }
-
-    /**
-     * Add the CSS & JavaScript files you want to be added on the FO.
-     */
-    public function hookHeader()
-    {
-        $this->context->controller->addJS($this->_path.'/views/js/front.js');
-        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
 
     public function renderWidget($hookName = null, array $configuration = [])
